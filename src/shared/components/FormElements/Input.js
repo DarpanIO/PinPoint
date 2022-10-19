@@ -1,4 +1,5 @@
-import React, { useReducer } from "react";
+import React, { useReducer, useEffect } from "react";
+
 import { validate } from "../../util/validators";
 import "./Input.css";
 
@@ -8,13 +9,13 @@ const inputReducer = (state, action) => {
       return {
         ...state,
         value: action.val,
-        isValid: validate(action.val,action.validators),
+        isValid: validate(action.val, action.validators),
       };
-    case 'TOUCH':{
+    case "TOUCH": {
       return {
         ...state,
-        isTouched:true
-      }
+        isTouched: true,
+      };
     }
     default:
       return state;
@@ -24,15 +25,31 @@ const inputReducer = (state, action) => {
 const Input = (props) => {
   const [inputState, dispatch] = useReducer(inputReducer, {
     value: "",
+    isTouched: false,
     isValid: false,
   });
 
+  const { id, onInput } = props;
+  const { value, isValid } = inputState;
+
+  useEffect(() => {
+    onInput(id, value, isValid);
+  }, [id, value, isValid, onInput]);
+
   const changeHandler = (event) => {
-    dispatch({ type: "CHANGE", val: event.target.value, validators:props.validators });
+    dispatch({
+      type: "CHANGE",
+      val: event.target.value,
+      validators: props.validators,
+    });
   };
+
   const touchHandler = () => {
-    dispatch({ type: "TOUCH"});
+    dispatch({
+      type: "TOUCH",
+    });
   };
+
   const element =
     props.element === "input" ? (
       <input
@@ -44,10 +61,21 @@ const Input = (props) => {
         value={inputState.value}
       />
     ) : (
-      <textarea id={props.id} rows={props.rows || 3} onChange={changeHandler} value={inputState.value}/>
+      <textarea
+        id={props.id}
+        rows={props.rows || 3}
+        onChange={changeHandler}
+        onBlur={touchHandler}
+        value={inputState.value}
+      />
     );
+
   return (
-    <div className={`form-control ${!inputState.isValid && inputState.isTouched &&"form-control--invalid"}`}>
+    <div
+      className={`form-control ${
+        !inputState.isValid && inputState.isTouched && "form-control--invalid"
+      }`}
+    >
       <label htmlFor={props.id}>{props.label}</label>
       {element}
       {!inputState.isValid && inputState.isTouched && <p>{props.errorText}</p>}
