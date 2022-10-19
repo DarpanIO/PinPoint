@@ -22,6 +22,7 @@ const Map = props => {
     });
   }, [center, zoom]);
  
+  
   return (
     <div
       ref={mapRef}
