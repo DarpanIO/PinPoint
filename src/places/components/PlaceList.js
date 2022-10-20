@@ -25,7 +25,7 @@ export default function PlaceList(props) {
           description={place.description}
           address={place.address}
           creatorId={place.creator}
-          cordinates={place.location}
+          coordinates={place.location}
         />
       ))}
     </ul>
