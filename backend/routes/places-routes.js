@@ -1,10 +1,48 @@
-const express=require('express');
+const express = require("express");
 
-const router=express.Router();
+const router = express.Router();
 
-router.get('/',(req,res,next)=>{
-    console.log('GET Request in Places');
-    res.json({message:"It works!"})
-})
+const DUMMY_PLACES = [
+  {
+    id: "p1",
+    title: "Empire State Building",
+    description: "Oneof the most famous sky scrappers in the world",
+    location: {
+      lat: 40.7484474,
+      lng: -73.9871516,
+    },
+    address: "20 W 34th st. New York",
+    creator: "u1",
+  },
+];
 
-module.exports=router;
+router.get("/:pid", (req, res, next) => {
+  const placeId = req.params.pid;
+  const place = DUMMY_PLACES.find((p) => {
+    return p.id === placeId;
+  });
+  if (!place) {
+    const error = new Error("Could not find the place for the provided id.");
+    error.code = 404;
+    throw error;
+  }
+  res.json({ place });
+});
+
+router.get("/user/:uid", (req, res, next) => {
+  const userId = req.params.uid;
+  const place = DUMMY_PLACES.find((p) => {
+    return p.creator === userId;
+  });
+
+  if (!place) {
+    const error = new Error(
+      "Could not find the place for the provided user id."
+    );
+    error.code = 404;
+    return next(error);
+  }
+  res.json({ place });
+});
+
+module.exports = router;
