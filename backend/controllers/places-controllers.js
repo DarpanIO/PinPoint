@@ -47,7 +47,11 @@ const createPlace = (req, res, next) => {
     console.log(errors);
     throw new HttpError("Invalid Input response,please check your data", 422);
   }
-  const { title, description, coordinates, address, creator } = req.body;
+  const { title, description, address, creator } = req.body;
+  let coordinates={
+      lat: 40.7484474,
+      lng: -73.9871516,
+  };
   const createdPlace = {
     id: uuidv4(),
     title,
