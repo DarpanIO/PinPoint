@@ -1,7 +1,8 @@
 const { v4: uuidv4 } = require("uuid");
-
 const HttpError = require("../models/http-error");
 const { validationResult } = require("express-validator");
+const Place = require("../models/place");
+
 let DUMMY_PLACES = [
   {
     id: "p1",
@@ -41,26 +42,35 @@ const getPlacesByUserId = (req, res, next) => {
   res.json({ places });
 };
 
-const createPlace = (req, res, next) => {
+const createPlace = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     console.log(errors);
     throw new HttpError("Invalid Input response,please check your data", 422);
   }
   const { title, description, address, creator } = req.body;
-  let coordinates={
-      lat: 40.7484474,
-      lng: -73.9871516,
+  let coordinates = {
+    lat: 40.7484474,
+    lng: -73.9871516,
   };
-  const createdPlace = {
-    id: uuidv4(),
+  const createdPlace = new Place({
     title,
     description,
     location: coordinates,
     address,
     creator,
-  };
-  DUMMY_PLACES.push(createdPlace);
+    image:
+      "https://cropper.watch.aetnd.com/public-content-aetn.video.aetnd.com/video-thumbnails/AETN-History_VMS/21/202/tdih-may01-HD.jpg?w=548",
+    creator,
+  });
+try{
+  createdPlace.save();
+}
+catch(err){
+  const error= new HttpError("Creating Place Failed , please try again",500);
+  console.log(err)
+  return next(error)
+}
   res.status(201).json(createdPlace);
 };
 
