@@ -20,34 +20,51 @@ let DUMMY_PLACES = [
 const getPlaceById = async (req, res, next) => {
   const placeId = req.params.pid;
   let place;
-  try{
-    place = await Place.findById(placeId)
-  }
-  catch(err){
-    const Error= new HttpError("Something went wrong, could not find a place",500)
-    console.log(err)
-    return next(Error)
+  try {
+    place = await Place.findById(placeId);
+  } catch (err) {
+    const Error = new HttpError(
+      "Something went wrong, could not find a place",
+      500
+    );
+    console.log(err);
+    return next(Error);
   }
   if (!place) {
-    const error= new HttpError("Could not find the place for the provided id.", 404);
-    return next(Error)
+    const error = new HttpError(
+      "Could not find the place for the provided id.",
+      404
+    );
+    return next(error);
   }
   // res.json({ place});
-  res.json({ place : place.toObject({getters:true})});
+  res.json({ place: place.toObject({ getters: true }) });
 };
 
-const getPlacesByUserId = (req, res, next) => {
+const getPlacesByUserId = async (req, res, next) => {
   const userId = req.params.uid;
-  const places = DUMMY_PLACES.filter((p) => {
-    return p.creator === userId;
-  });
-
-  if (!places || places.length === 0) {
-    return next(
-      new HttpError("Could not find the place for the provided user id.")
+  let places;
+  try {
+    places = await Place.find({ creator: userId });
+  } catch (err) {
+    const Error = new HttpError(
+      "Something went wrong, could not find a place",
+      500
     );
+    console.log(err);
+    return next(Error);
   }
-  res.json({ places });
+  if (!places || places.length === 0) {
+    const error = new HttpError(
+      "Could not find the place for the provided user id.",
+      404
+    );
+    return next(error);
+  }
+  // res.json({ places });
+  res.json({
+    places: places.map((place) => place.toObject({ getters: true })),
+  });
 };
 
 const createPlace = async (req, res, next) => {
@@ -71,14 +88,16 @@ const createPlace = async (req, res, next) => {
       "https://cropper.watch.aetnd.com/public-content-aetn.video.aetnd.com/video-thumbnails/AETN-History_VMS/21/202/tdih-may01-HD.jpg?w=548",
     creator,
   });
-try{
-  createdPlace.save();
-}
-catch(err){
-  const error= new HttpError("Creating Place Failed , please try again",500);
-  console.log(err)
-  return next(error)
-}
+  try {
+    createdPlace.save();
+  } catch (err) {
+    const error = new HttpError(
+      "Creating Place Failed , please try again",
+      500
+    );
+    console.log(err);
+    return next(error);
+  }
   res.status(201).json(createdPlace);
 };
 
