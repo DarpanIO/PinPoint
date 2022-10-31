@@ -13,15 +13,19 @@ let DUMMY_USERS = [
   },
 ];
 
-const getUsers = (req, res, next) => {
-  const users = DUMMY_USERS;
-
-  if (!users || users.length === 0) {
-    return next(
-      new HttpError("Could not find the place for the provided user id.")
+const getUsers = async (req, res, next) => {
+  let users;
+  try {
+    users = await User.find({}, "-password");
+  } catch (err) {
+    const error = new HttpError(
+      "Fetching users failed, please try again later.",
+      500
     );
+    return next(error);
   }
-  res.json({ users });
+
+  res.json({ users: users.map((user) => user.toObject({ getters: true })) });
 };
 
 const addUser = async (req, res, next) => {
@@ -30,9 +34,9 @@ const addUser = async (req, res, next) => {
     console.log(errors);
     return next(
       new HttpError("Invalid Input response,please check your data", 422)
-    ); 
+    );
   }
-  const { name, email, password,places } = req.body;
+  const { name, email, password, places } = req.body;
   let existingUser;
   try {
     existingUser = await User.findOne({ email: email });
@@ -55,37 +59,47 @@ const addUser = async (req, res, next) => {
     name,
     email,
     places,
-    image:"https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?w=2000",
-    password
+    image:
+      "https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?w=2000",
+    password,
   });
   try {
     createdUser.save();
   } catch (err) {
-    const error = new HttpError(
-      "Signing up Failed , please try again",
-      500
-    );
+    const error = new HttpError("Signing up Failed , please try again", 500);
     console.log(err);
     return next(error);
   }
-  res.status(201).json({user:createdUser.toObject({getters:true})});
+  res.status(201).json({ user: createdUser.toObject({ getters: true }) });
 };
 
-const loginUser = (req, res, next) => {
+const loginUser = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     console.log(errors);
     throw new HttpError("Invalid Input response,please check your data", 422);
   }
   const { email, password } = req.body;
-  const user = DUMMY_USERS.find((u) => {
-    return u.email === email && u.password === password;
-  });
-  if (user) res.status(200).json("Login Successfully");
-  else
-    res
-      .status(404)
-      .json({ message: "Email and password does not match with the database" });
+  let existingUser;
+  try {
+    existingUser = await User.findOne({ email: email });
+  } catch (err) {
+    const Error = new HttpError(
+      "Loging in failed , please try again later",
+      500
+    );
+    return next(Error);
+  }
+
+  if (!existingUser || existingUser.password !== password) {
+    const error = new HttpError(
+      "Invalid credentials, could not log you in",
+      401
+    );
+
+    return next(error);
+  }
+  res.json({ message: "Logged in !" });
 };
 
 exports.addUser = addUser;

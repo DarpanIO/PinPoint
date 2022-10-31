@@ -3,10 +3,12 @@ const bodyParser = require("body-parser");
 const HttpError = require("./models/http-error");
 const placesRoutes = require("./routes/places-routes");
 const usersRoutes = require("./routes/users-routes");
-const mongoose=require('mongoose')
+const mongoose = require("mongoose");
 const app = express();
 
-const port=5000;
+const port = 5000;
+console.log("Server started at http://localhost:" + port);
+
 app.use(bodyParser.json());
 app.use("/api/places", placesRoutes);
 app.use("/api/users", usersRoutes);
@@ -24,9 +26,15 @@ app.use((error, req, res, next) => {
   res.json({ message: error.message || "An unknown error occurred" });
 });
 
-mongoose.connect("mongodb+srv://darpan:darpan@cluster0.xcyayy8.mongodb.net/places?retryWrites=true&w=majority").then(()=>{
-  app.listen(port);
-  console.log("connected to Databas at http://localhost:"+port)
-}).catch(err=>{
-  console.log(err);
-})
+mongoose
+  .connect(
+    "mongodb+srv://darpan:darpan@cluster0.xcyayy8.mongodb.net/places?retryWrites=true&w=majority"
+    // "mongodb://localhost:27017"
+  )
+  .then(() => {
+    app.listen(port);
+    console.log("Connected to database");
+  })
+  .catch((err) => {
+    console.log(err);
+  });
