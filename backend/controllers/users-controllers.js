@@ -77,7 +77,9 @@ const loginUser = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     console.log(errors);
-    throw new HttpError("Invalid Input response,please check your data", 422);
+    return next(
+      new HttpError("Invalid Input response,please check your data", 422)
+    ) 
   }
   const { email, password } = req.body;
   let existingUser;
