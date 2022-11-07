@@ -11,18 +11,23 @@ export const useHttpClient = () => {
       const httpAbortCtrl = new AbortController();
       activeHttpRequests.current.push(httpAbortCtrl);
       try {
-        const response = await fetch(url, { method, body, headers , signal:httpAbortCtrl.signal});
+        const response = await fetch(url, {
+          method,
+          body,
+          headers,
+          signal: httpAbortCtrl.signal,
+        });
 
         const responseData = await response.json();
 
         activeHttpRequests.current = activeHttpRequests.current.filter(
-            reqCtrl => reqCtrl !== httpAbortCtrl
-        )
+          (reqCtrl) => reqCtrl !== httpAbortCtrl
+        );
 
         if (!response.ok) {
           throw new Error(responseData.message);
         }
-        
+
         setIsLoading(false);
         return responseData;
       } catch (err) {
@@ -38,10 +43,10 @@ export const useHttpClient = () => {
     setError(null);
   };
 
-  useEffect(()=>{
-    return ()=>{
-        activeHttpRequests.current.forEach(abortCtrl => abortCtrl.abort())
-    }
-  },[])
+  useEffect(() => {
+    return () => {
+      activeHttpRequests.current.forEach((abortCtrl) => abortCtrl.abort());
+    };
+  }, []);
   return { isLoading, error, sendRequest, clearError };
 };
