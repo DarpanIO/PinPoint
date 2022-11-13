@@ -31,12 +31,11 @@ const getUsers = async (req, res, next) => {
 const addUser = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    console.log(errors);
     return next(
       new HttpError("Invalid Input response,please check your data", 422)
     );
   }
-  const { name, email, password, places } = req.body;
+  const { name, email, password} = req.body;
   let existingUser;
   try {
     existingUser = await User.findOne({ email: email });
@@ -58,9 +57,8 @@ const addUser = async (req, res, next) => {
   const createdUser = new User({
     name,
     email,
-    places,
-    image:
-      "https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?w=2000",
+    places:[],
+    image:req.file.path,
     password,
   });
   try {

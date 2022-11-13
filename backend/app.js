@@ -1,3 +1,5 @@
+const fs= require('fs')
+const path = require('path')
 const express = require("express");
 const bodyParser = require("body-parser");
 const HttpError = require("./models/http-error");
@@ -10,7 +12,7 @@ const port = 5000;
 console.log("Server started at http://localhost:" + port);
 
 app.use(bodyParser.json());
-
+app.use('/uploads/images',express.static(path.join('uploads','images')))
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST, DELETE, PATCH');
@@ -26,6 +28,11 @@ app.use((req, res, next) => {
 });
 
 app.use((error, req, res, next) => {
+  if(req.file){
+    fs.unlink(req.file.path,(err)=>{
+      console.log(err);
+    })
+  }
   if (res.headerSent) {
     return next(error);
   }
