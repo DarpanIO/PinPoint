@@ -1,3 +1,4 @@
+const fs= require('fs')
 const { v4: uuidv4 } = require("uuid");
 const HttpError = require("../models/http-error");
 const { validationResult } = require("express-validator");
@@ -75,7 +76,7 @@ const createPlace = async (req, res, next) => {
     console.log(errors);
     return next(
       new HttpError("Invalid Input response,please check your data", 422)
-    ) 
+    );
   }
   const { title, description, address, creator } = req.body;
   let coordinates = {
@@ -88,8 +89,7 @@ const createPlace = async (req, res, next) => {
     location: coordinates,
     address,
     creator,
-    image:
-      "https://cropper.watch.aetnd.com/public-content-aetn.video.aetnd.com/video-thumbnails/AETN-History_VMS/21/202/tdih-may01-HD.jpg?w=548",
+    image: req.file.path,
     creator,
   });
 
@@ -171,18 +171,18 @@ const deletePlace = async (req, res, next) => {
     return next(Error);
   }
 
-  if(!place){
-    const error= new HttpError("Could not find place for this id",404);
-    return next(error)
+  if (!place) {
+    const error = new HttpError("Could not find place for this id", 404);
+    return next(error);
   }
-
+  const imagePath = place.image;
   try {
     // await place.remove();
-    const sess= await mongoose.startSession();
+    const sess = await mongoose.startSession();
     sess.startTransaction();
-    await place.remove({session:sess});
-    place.creator.places.pull(place)
-    await place.creator.save({session:sess})
+    await place.remove({ session: sess });
+    place.creator.places.pull(place);
+    await place.creator.save({ session: sess });
     sess.commitTransaction();
   } catch (err) {
     const Error = new HttpError(
@@ -192,6 +192,9 @@ const deletePlace = async (req, res, next) => {
     return next(Error);
   }
 
+  fs.unlink(imagePath,err=>{
+    console.log(err)
+  })
   res.status(200).json({ message: "Deleted Place" });
 };
 
