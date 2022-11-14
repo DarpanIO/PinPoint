@@ -16,7 +16,7 @@ app.use('/uploads/images',express.static(path.join('uploads','images')))
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST, DELETE, PATCH');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Accept,Authorization ,Origin, X-Requested-With');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization ,Origin, X-Requested-With');
   next();
 });
 app.use("/api/places", placesRoutes);

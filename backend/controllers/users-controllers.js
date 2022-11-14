@@ -151,7 +151,7 @@ const loginUser = async (req, res, next) => {
       { expiresIn: "1h" }
     );
   } catch (err) {
-    const error = new HttpError("Signing up Failed , please try again", 500);
+    const error = new HttpError("Logging Failed , please try again", 500);
     console.log(err);
     return next(error);
   }
@@ -159,7 +159,7 @@ const loginUser = async (req, res, next) => {
   res.json({
     userId:existingUser.id,
     email:existingUser.email,
-    token:existingUser.token
+    token:token
   });
 };
 
