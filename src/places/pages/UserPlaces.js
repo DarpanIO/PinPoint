@@ -21,9 +21,11 @@ const UserPlaces = () => {
   }, [sendRequest, userId]);
 
   const placeDeleteHandler = (deletedPlaceId) => {
-    setLoadedPlaces((prevPlaces) =>
-      prevPlaces.filter((place) => place.id !== deletedPlaceId)
+    setLoadedPlaces(prevPlaces =>
+      prevPlaces.filter(place => place.id !== deletedPlaceId)
     );
+    console.log(deletedPlaceId)
+    console.log(loadedPlaces)
   };
   return (
     <>
@@ -36,7 +38,7 @@ const UserPlaces = () => {
       {!isLoading && loadedPlaces && (
         <PlaceList
           items={loadedPlaces}
-          onDeletePlaceHanler={placeDeleteHandler}
+          onDeletePlaceHandler={placeDeleteHandler}
         />
       )}
     </>
