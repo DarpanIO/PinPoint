@@ -39,10 +39,9 @@ app.use((error, req, res, next) => {
   res.status(error.code || 500);
   res.json({ message: error.message || "An unknown error occurred" });
 });
-
 mongoose
   .connect(
-    "mongodb+srv://darpan:darpan@cluster0.xcyayy8.mongodb.net/places?retryWrites=true&w=majority"
+    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.xcyayy8.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`
     // "mongodb://localhost:27017"
   )
   .then(() => {

@@ -1,0 +1,8 @@
+{
+    "env":{
+        "DB_USER":"darpan",
+        "DB_PASSWORD":"darpan",
+        "DB_NAME":"places",
+        "JWT_KEY":"supersecret_dont_share"
+    }
+}
